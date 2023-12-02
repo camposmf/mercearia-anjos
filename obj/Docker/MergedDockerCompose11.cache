@@ -1,0 +1,60 @@
+name: dockercompose15817025660521967275
+services:
+  web-api:
+    build:
+      context: C:\Users\camposmf\Videos\projetos\mercearia
+      dockerfile: web-api/Dockerfile
+    container_name: web-api
+    depends_on:
+      web-db:
+        condition: service_started
+        required: true
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: https://+:443;http://+:80
+      ConnectionStrings__DefaultConnection: Data Source=localhost; Initial Catalog=merceariaDb; Persist Security Info=True; Trust Server Certificate=true; User ID=sa; Password=SolhiDatabase#1;
+    image: webapi
+    networks:
+      mercearia-network: null
+    ports:
+      - mode: ingress
+        target: 80
+        protocol: tcp
+      - mode: ingress
+        target: 80
+        published: "8001"
+        protocol: tcp
+      - mode: ingress
+        target: 443
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: C:\Users\camposmf\AppData\Roaming/Microsoft/UserSecrets
+        target: /root/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\camposmf\AppData\Roaming/ASP.NET/Https
+        target: /root/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+  web-db:
+    container_name: web-db
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: SolhiDatabase#1
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    networks:
+      mercearia-network: null
+    ports:
+      - mode: ingress
+        target: 1433
+        published: "1433"
+        protocol: tcp
+    restart: always
+networks:
+  mercearia-network:
+    name: dockercompose15817025660521967275_mercearia-network
+    driver: bridge

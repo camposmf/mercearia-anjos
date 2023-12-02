@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+  web-api:
+    image: web-api
+    container_name: web-api
+    ports:
+      - "8001:80"
+    build:
+      context: .
+      dockerfile: ./Dockerfile

@@ -1,0 +1,47 @@
+version: '3.9'
+
+networks: 
+  mercearia-network:
+    driver: bridge
+
+services:
+    web-api:
+        image: web-api
+        container_name: web-api
+        build:
+            context: ./web-api
+            dockerfile: ./Dockerfile
+        ports:
+          - "8001:80"
+        environment:
+          - ConnectionStrings__DefaultConnection=Data Source=web-db; Initial Catalog=merceariaDb; Persist Security Info=True; Trust Server Certificate=true; User ID=sa; Password=SolhiDatabase#1;
+          - ASPNETCORE_URLS=http://+8001
+        depends_on:
+          - web-db
+        networks:
+          - mercearia-network
+
+    web-db:
+        container_name: web-db
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        ports:
+         - "1433:1433"
+        environment:
+         - ACCEPT_EULA=Y
+         - SA_PASSWORD=SolhiDatabase#1
+        volumes:
+         - C:\dados\volumes\mssql:/var/opt/mssql/data
+        restart: always
+        networks:
+          - mercearia-network
+
+    web-app:
+        image: web-app
+        container_name: web-app
+        build:
+            context: ./web-app
+            dockerfile: ./Dockerfile
+        ports:
+          - "4200:80"
+        networks:
+          - mercearia-network
